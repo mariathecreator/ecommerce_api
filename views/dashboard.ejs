@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md hidden md:block">
+    <div class="p-6 text-xl font-bold text-blue-600">Admin Dashboard</div>
+    <nav class="mt-4">
+      <!--a href="" class="block py-2 px-6 hover:bg-blue-50">Dashboard</a-->
+      <a href="/manageuser" class="block py-2 px-6 hover:bg-blue-50">Manage Users</a>
+      <a href="/addproduct" class="block py-2 px-6 hover:bg-blue-50">Add Products</a>
+      <header class="bg-white shadow-md p-4 mb-4 rounded-md">
+        <div class="flex justify-between items-center">
+
+          <div class="flex items-center">
+            <a href="/logout"><button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                type="button"> Logout</button></a>
+          </div>
+        </div>
+      </header>
+      <!--a href="#" class="block py-2 px-6 hover:bg-blue-50">Orders</a-->
+      <!--a href="#" class="block py-2 px-6 hover:bg-blue-50">Settings</a-->
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow p-4 flex justify-between items-center">
+      <h1 class="text-lg font-semibold">Welcome, Admin</h1>
+      <button class="md:hidden p-2 rounded hover:bg-gray-200">
+        <!-- Hamburger Icon -->
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Dashboard Sections -->
+    <main>
+      <!-- User Management -->
+
+      <!-- Add Product -->
+
+      <!-- User Data Table -->
+      <section class="bg-white p-4 rounded shadow col-span-1 lg:col-span-1 w-full">
+
+        <div>
+          <h2 class="text-xl font-semibold mb-4">Users Data</h2>
+          <table class="w-[50rem] bg-white border  ">
+            <thead class="bg-white">
+              <tr>
+                <th class="text-left py-2 px-4 border-b">Username</th>
+                <th class="text-left py-2 px-4 border-b">Email</th>
+                <th class="text-left py-2 px-4 border-b">Role</th>
+                <th class="text-left py-2 px-9 border-b">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% dis.forEach(user=> { %>
+                <tr>
+                  <td class="py-2 px-4 border-b">
+                    <%= user.name %>
+                  </td>
+                  <td class="py-2 px-4 border-b">
+                    <%= user.email %>
+                  </td>
+                  <td class="py-2 px-4 border-b ">
+                    <%= user.role === true ? 'Admin' : 'User' %>
+                  </td>
+
+                  <td id="live" class="py-2 px-4 border-b">
+                    <% if (user.lastlogin&&(!user.lastlogout||user.lastlogin> user.lastlogout)) { %>
+                      <span class="text-green-500 font-semibold">Online</span>
+                      <% } else { %>
+                        <span class="text-gray-500">Offline</span>
+                        <% } %>
+                  </td>
+
+                  <td class="py-1 px-4 border-b text-center space-x-2">
+                    <% if (user.status==true){ %>
+                      <a href="/status/<%= user._id %>/disable"
+                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Disable</a>
+                      <% } else { %>
+                        <a href="/status/<%= user._id %>/enable"
+                          class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Enable</a>
+                        <% } %>
+                  </td>
+                  <td class="py-1 px-4 border-b text-center space-x-2">
+                    <a href="/update/<%= user._id %>"
+                      class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Edit</a>
+
+                    <a href="/delete/<%=user._id %>"
+                      class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Delete</a>
+                  </td>
+                </tr>
+                <% } ) %>
+
+                  <!-- Populate dynamically with backend data -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="bg-white p-4 rounded shadow col-span-1 lg:col-span-1 w-full">
+
+        <div>
+          <h2 class="text-xl font-semibold mb-4">Product Details</h2>
+          <table class="w-[50rem] bg-white border  ">
+            <thead class="bg-white">
+              <tr>
+                <th class="text-left py-2 px-4 border-b">Name</th>
+                <th class="text-left py-2 px-4 border-b">Price</th>
+                <th class="text-left py-2 px-4 border-b">Brand</th>
+                <th class="text-left py-2 px-4 border-b">Created at</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% dos.forEach(product=> { %>
+                <tr>
+                  <td class="py-2 px-4 border-b">
+                    <%= product.name %>
+                  </td>
+                  <td class="py-2 px-4 border-b">
+                    <%= product.price %>
+                  </td>
+                  <td class="py-2 px-4 border-b">
+                    <%= product.brand %>
+                  </td>
+                  <td class="py-2 px-4 border-b ">
+                    <%= product.created_at.toDateString() %>
+                  </td>
+
+
+                  <td class="py-2 px-4 border-b text-center space-x-2">
+                    <a href="/product/<%= product._id %>"
+                      class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Edit</a>
+
+                    <a href="/trash/<%=product._id %>"
+                      class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Delete</a>
+                  </td>
+                </tr>
+                <% } ) %>
+
+                  <!-- Populate dynamically with backend data -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+
+<script>
+ // document.getElementById('live').adde
+</script>
+</html>
