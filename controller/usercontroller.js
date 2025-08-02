@@ -20,6 +20,10 @@ const adduser = async (req, res) => {
     return res.status(203).json({ message: 'registered sucessfully' })
 }
 
+const findusers=async(req,res)=>{
+    const find = await user.find()
+    res.send(find)
+}
 
 const login = async (req, res) => {
     try {
@@ -108,4 +112,4 @@ const adminlogout = async (req, res) => {
 }
 
 
-export { adduser, login, adminlogin, logout, adminlogout }
+export { adduser,findusers, login, adminlogin, logout, adminlogout }

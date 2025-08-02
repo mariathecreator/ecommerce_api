@@ -14,10 +14,10 @@ export const uploads = multer({ storage: storage })
 
 const addproduct = async (req, res) => {
     try {
-        const { name, brand, price, description } = req.body
+        const { name, brand, price, description, category } = req.body
         const image = req.file.filename
-        const add = await product.create({ name, brand, price, description, image })
-        return res.status(200).json({ message: 'products added sucessfully' })
+        const add = await product.create({ name, brand, price, description, category, image })
+        return res.status(200).json({ message: 'products added sucessfully', add })
     }
     catch (err) {
         return res.send(err)
@@ -25,9 +25,11 @@ const addproduct = async (req, res) => {
 }
 const updateproduct = async (req, res) => {
     try {
+        const existing = await product.findById(req.params.id)
+
         const { name, brand, price, description } = req.body
         const image = req.file ? req.file.filename : existing.image
-        const update = await product.findByIdAndUpdate(req.params.id, { name, brand, price, description, image }, { new: true })
+        const update = await product.findByIdAndUpdate(req.params.id,{ name, brand, price, description,image } , { new: true })
         return res.status(201).json({ message: 'product updated sucessfully' })
     }
     catch (err) {
@@ -35,25 +37,25 @@ const updateproduct = async (req, res) => {
     }
 }
 
-const findproduct = async(req,res)=>{
-    try{
-        const find= await product.find()
-        console.log(find);
-        
+const findproduct = async (req, res) => {
+    try {
+        const find = await product.find()
+       return res.send(find)
+
     }
-    catch(err){
-        res.send(err)
+    catch (err) {
+       return res.send(err)
     }
 }
 
-const deleteproduct = async(req,res)=>{
-    try{
+const deleteproduct = async (req, res) => {
+    try {
         await product.findByIdAndDelete(req.params.id)
-       return res.status(202).json({message:'product deleted sucessfully'})
+        return res.status(202).json({ message: 'product deleted sucessfully' })
     }
-    catch(err){
-      return  res.send(err)
+    catch (err) {
+        return res.send(err)
     }
 }
 
-export {addproduct,updateproduct,deleteproduct,findproduct} 
+export { addproduct, updateproduct, deleteproduct, findproduct } 
