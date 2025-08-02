@@ -1,7 +1,4 @@
 import { cart } from "../model/cartmodel.js";
-// import { user } from "../model/usermodel.js";
-// import { product } from "../model/productmodel.js";
-// import mongoose from "mongoose";
 
 export const addtocart = async (req, res) => {
     const product = req.params.id
@@ -9,18 +6,14 @@ export const addtocart = async (req, res) => {
     const user = req.session.userId
 
 
-    console.log(product);
-
-
     const newproductid = product
     try {
 
         if (!user) {
-            res.status(401).json({ message: 'no user session found' })
+            res.status(401).json({ message: 'no cart found' })
         }
         const cartexist = await cart.findOne({ userId: user })
         console.log(cartexist);
-        console.log("hai");
 
         if (cartexist) {
             const existingindex = await cartexist.items.findIndex((item) => {
@@ -50,7 +43,6 @@ export const addtocart = async (req, res) => {
                 }]
             }
             const addcart = await cart.create(cartdata)
-            console.log("hauwai");
             return res.send(addcart)
         }
 
@@ -60,6 +52,41 @@ export const addtocart = async (req, res) => {
         return res.send(err)
     }
 }
+
+
+export const updatecart = async (req, res) => {
+    const product = req.params.id
+    const user = req.session.userId
+    const { quantity } = req.body
+
+    try {
+        const getcart = await cart.findOne({ userId: user })
+        console.log(getcart);
+
+        if (!getcart) {
+            res.status(401).json({ message: 'no cart found' })
+        }
+        else {
+            const index = getcart.items.findIndex(item => item.product == product)
+
+            if (index !== -1) {
+                getcart.items[index].quantity = quantity
+
+            }
+            else{
+                getcart.items.push(quantity)
+
+            }
+            await getcart.save()
+            res.send(getcart)
+        }
+
+    }
+    catch (err) {
+        res.send(err)
+    }
+}
+
 
 
 export const deleteCartItem = async (req, res) => {
@@ -75,8 +102,8 @@ export const deleteCartItem = async (req, res) => {
         }
         findcart.items = findcart.items.filter(item => item.product.toString() !== newproduct)
         await findcart.save()
-        
-        
+
+
         return res.status(202).json({ message: 'item deleted from cart sucessfully', findcart })
     }
     catch (err) {

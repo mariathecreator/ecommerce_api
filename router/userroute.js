@@ -1,6 +1,6 @@
 import express from "express"
 import {adduser,login,logout} from "../controller/usercontroller.js"
-import { addtocart, deleteCartItem } from "../controller/cartcontroller.js"
+import { addtocart, deleteCartItem, updatecart } from "../controller/cartcontroller.js"
 import { getcategory } from "../controller/categorycontrol.js"
 import { findproduct } from "../controller/productcontrol.js"
 
@@ -23,6 +23,7 @@ route.use('/user',(req,res,next)=>{
 })
 route.delete('/user/logout/:id',logout)
 route.post('/user/addcart/:id',addtocart)
+route.put('/user/updatecart/:id',updatecart)
 route.delete('/user/deleteitems/:id',deleteCartItem)
 
 

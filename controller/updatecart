@@ -1,0 +1,25 @@
+
+
+
+export const updatecart = async (req, res) => {
+    const product = req.params.id
+    const user = req.session.userId
+    const { quantity } = req.body
+
+    try {
+        const getcart = await cart.findOne({ userId: user })
+        console.log(getcart);
+
+        if (!getcart) {
+            res.status(401).json({ message: 'no cart found' })
+        }
+        else {
+            getcart.items = getcart.items.filter(item => item.quantity == quantity)
+        }
+       await getcart.save()
+    }
+
+    catch (err) {
+        res.send(err)
+    }
+}
