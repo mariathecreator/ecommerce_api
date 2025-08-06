@@ -16,10 +16,145 @@ export const updatecart = async (req, res) => {
         else {
             getcart.items = getcart.items.filter(item => item.quantity == quantity)
         }
-       await getcart.save()
+        await getcart.save()
     }
 
     catch (err) {
         res.send(err)
     }
 }
+
+
+
+// const sub = await cart.aggregate([
+//     {
+//         $match: { _userId: mongoose.Types.ObjectId(user) }
+//     },
+//     { $unwind: '$items' },
+//     {
+//         $lookup: {
+//             from: 'products',
+//             localField: 'product',
+//             foreignField: '_id',
+//             as: 'productdetails'
+//         }
+//     },
+//     { $project: { _id: 0, sub: { $multiply: ['$productdetails.quantity', '$productdetails.price'] } } },
+//     { $group: { _id: '$product', subtotal: { $sum: '$sub' } } }
+// ])
+
+
+
+async function calculateCartTotals(userId) {
+    try {
+        const result = await cart.aggregate([
+            {
+                $match: { userId: mongoose.Types.ObjectId(userId) } // Match the specific user's cart
+            },
+            {
+                $unwind: '$items' // Deconstruct the 'items' array into separate documents
+            },
+            {
+                $addFields: {
+                    'items.subtotal': { $multiply: ['$items.quantity', '$items.price'] } // Calculate subtotal for each item
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id', // Group back by the cart ID
+                    userId: { $first: '$userId' },
+                    items: { $push: '$items' }, // Reconstruct the 'items' array with subtotal
+                    total: { $sum: '$items.subtotal' } // Calculate the total sum of all item subtotals
+                }
+            }
+        ]);
+
+        return result[0]; // The result will be an array, take the first element (the aggregated cart)
+    } catch (error) {
+        console.error('Error calculating cart totals:', error);
+        throw error;
+    }
+}
+
+
+// to find the total
+
+    const Cart = require('./models/cart'); // Assuming your Cart model is in models/cart.js
+
+    async function getCartTotal(userId) {
+        try {
+            const result = await Cart.aggregate([
+                { $match: { userId: userId } }, // Match the specific user's cart
+                { $unwind: '$items' }, // Deconstruct the items array
+                {
+                    $lookup: {
+                        from: 'products', // The collection name for products
+                        localField: 'items.productId',
+                        foreignField: '_id',
+                        as: 'productDetails',
+                    },
+                },
+                { $unwind: '$productDetails' }, // Deconstruct the productDetails array
+                {
+                    $project: {
+                        _id: 0, // Exclude the default _id
+                        subtotal: { $multiply: ['$items.quantity', '$productDetails.price'] },
+                    },
+                },
+                {
+                    $group: {
+                        _id: null, // Group all documents into a single group
+                        cartTotal: { $sum: '$subtotal' }, // Sum the subtotals
+                    },
+                },
+            ]);
+
+            if (result.length > 0) {
+                return result[0].cartTotal;
+            } else {
+                return 0; // Cart is empty or not found
+            }
+        } catch (error) {
+            console.error('Error calculating cart total:', error);
+            throw error;
+        }
+    }
+
+    // Example usage:
+    // const total = await getCartTotal(someUserId);
+    // console.log('Cart Total:', total);
+
+
+    // to find the subtotal and total
+
+    async function calculateCartTotals(userId) {
+  try {
+    const result = await Cart.aggregate([
+      {
+        $match: { userId: mongoose.Types.ObjectId(userId) } // Match the specific user's cart
+      },
+      {
+        $unwind: '$items' // Deconstruct the 'items' array into separate documents
+      },
+      {
+        $addFields: {
+          'items.subtotal': { $multiply: ['$items.quantity', '$items.priceAtTimeOfAddition'] } // Calculate subtotal for each item
+        }
+      },
+      {
+        $group: {
+          _id: '$_id', // Group by the original cart ID
+          userId: { $first: '$userId' },
+          items: { $push: '$items' }, // Push the modified items back into an array
+          total: { $sum: '$items.subtotal' } // Sum all item subtotals for the grand total
+        }
+      }
+    ]);
+
+    return result[0]; // Returns the aggregated cart with total and item subtotals
+  } catch (error) {
+    console.error('Error calculating cart totals:', error);
+    throw error;
+  }
+}
+

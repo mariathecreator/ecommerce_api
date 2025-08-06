@@ -58,7 +58,7 @@ const adminlogin = async (req, res) => {
     try {
         const { email, password } = req.body
 
-        const match = await user.findOne({ email }, { __v: 0 })
+        const match = await user.findOne({ email }, { __v: 0})
         console.log(match);
 
         if (!match) {

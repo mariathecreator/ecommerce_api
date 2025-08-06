@@ -16,11 +16,14 @@ const cartschema = new mongoose.Schema({
             type: Number,
             required: true,
             default: 1
+        },
+        subtotal:{
+            type:Number,
+            default:0
         }
     }],
     total: {
         type: Number,
-        required:false,
        default:0
     },
     created_at: {

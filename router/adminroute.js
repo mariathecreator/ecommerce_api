@@ -3,10 +3,12 @@ import express from "express"
 import { adminlogout, findusers,adminlogin } from "../controller/usercontroller.js"
 import {addproduct,updateproduct,deleteproduct,findproduct,uploads} from "../controller/productcontrol.js"
 import {getcategory,updatecategory,addcategory,deletecategory} from "../controller/categorycontrol.js"
+import { deleteOrder, getOrder, updateOrder } from "../controller/ordercontrol.js"
 
 const router = express()
 
 router.post('/admin/login',adminlogin)
+
 
 router.use('/admin',(req,res,next)=>{
     if(req.session.adminId){
@@ -27,5 +29,10 @@ router.get('/admin/getcategories',getcategory)
 router.post('/admin/addcategories',addcategory)
 router.put('/admin/updatecategories/:id',updatecategory)
 router.delete('/admin/deletecategories/:id',deletecategory)
+
+router.get('/admin/getorder',getOrder)
+router.put('/admin/updateorder/:id',updateOrder)
+router.delete('/admin/deleteorder/:id',deleteOrder)
+
 
 export default router

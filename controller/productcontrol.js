@@ -36,7 +36,7 @@ const updateproduct = async (req, res) => {
         return res.send(err)
     }
 }
-
+ 
 const findproduct = async (req, res) => {
     try {
         const find = await product.find()
@@ -45,6 +45,16 @@ const findproduct = async (req, res) => {
     }
     catch (err) {
        return res.send(err)
+    }
+}
+
+const findAProduct = async (req,res)=>{
+    try{
+        const findaproduct = await product.findById(req.params.id)
+        res.send(findaproduct)
+    }
+    catch(err){
+        res.status(500).json({message:'something went wrong',err})
     }
 }
 
@@ -58,4 +68,4 @@ const deleteproduct = async (req, res) => {
     }
 }
 
-export { addproduct, updateproduct, deleteproduct, findproduct } 
+export { addproduct, updateproduct, deleteproduct, findproduct, findAProduct } 
