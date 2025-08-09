@@ -28,29 +28,30 @@ export const addtocart = async (req, res) => {
             console.log(existingindex);
 
             if (existingindex !== -1) {
-                console.log("this is the if part");
+                if (quantity > 0) {
+                    console.log("this is the if part");
 
-                cartexist.items[existingindex].quantity += quantity
-                // cartexist.items[existingindex].subtotal = cartexist.items[existingindex].quantity * productexist.price
-                //  cartexist.total += cartexist.items[existingindex].subtotal
+                    cartexist.items[existingindex].quantity += quantity
+                    // cartexist.items[existingindex].subtotal = cartexist.items[existingindex].quantity * productexist.price
+                    //  cartexist.total += cartexist.items[existingindex].subtotal
+                }
+                else{
+                    return res.json({message:'quantity is negative'})
+                }
             }
             else {
                 console.log("this is the else part");
 
                 const name = {
-
                     product: productId,
                     quantity
                     // subtotal: quantity * productexist.price,
                     //  total: { $sum: subtotal }
-
-
                 }
                 console.log("why are you like this ");
 
                 cartexist.items.push(name)
                 console.log("you made me do this ");
-
 
             }
             await cartexist.save()
@@ -103,21 +104,26 @@ export const updatecart = async (req, res) => {
 
 
             if (index !== -1) {
-                getcart.items[index].quantity = quantity
-                // getcart.items[index].subtotal = getcart.items[index].quantity * getproduct.price
-                console.log("get out here! now");
+                if (quantity > 0) {
+                    getcart.items[index].quantity = quantity
+                    // getcart.items[index].subtotal = getcart.items[index].quantity * getproduct.price
+                    console.log("get out here! now");
+                }
+                else {
+                    return res.json({ message: 'quantity is negative' })
+                }
             }
             else {
-                const item = {
-                    product: productId,
-                    quantity,
-                    // subtotal: quantity * getproduct.price
-                }
-                getcart.items.push(item)
-
+                //     const item = {
+                //         product: productId,
+                //         quantity,
+                //         // subtotal: quantity * getproduct.price
+                //     }
+                //     getcart.items.push(item)
+                return res.json({ message: " item not found in the cart" })
 
             }
-            await getcart.save()
+            // await getcart.save()
             console.log("don't be shy");
             // console.log(getcart);
             return res.json({ message: "product added to cart sucessfully", getcart })
@@ -166,14 +172,14 @@ export const viewcart = async (req, res) => {
             }
         ])
         console.log(cartdetails);
-        
 
-        if(cartdetails.length === 0){
-            return res.json({message:'cart is empty'})
+
+        if (cartdetails.length === 0) {
+            return res.json({ message: 'cart is empty' })
         }
         res.json(cartdetails[0])
     }
-    catch(err){
+    catch (err) {
         res.status(500).json(err)
     }
 }
