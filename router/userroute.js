@@ -1,5 +1,5 @@
 import express from "express"
-import {adduser,login,logout} from "../controller/usercontroller.js"
+import {adduser,updateprofile,getprofile,login,logout} from "../controller/usercontroller.js"
 import { addtocart, deleteCartItem, updatecart, viewcart } from "../controller/cartcontroller.js"
 import { getcategory } from "../controller/categorycontrol.js"
 import { findproduct ,findAProduct} from "../controller/productcontrol.js"
@@ -28,7 +28,8 @@ route.use('/user',(req,res,next)=>{
 }
 })
 route.delete('/user/logout/:id',logout)
-
+route.get('/user/getprofile',getprofile)
+route.put('/user/updateprofile',updateprofile)
 route.post('/user/addcart/:id',addtocart)
 route.put('/user/updatecart/:id',updatecart)
 route.get('/user/viewcart',viewcart)

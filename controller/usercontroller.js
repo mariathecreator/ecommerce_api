@@ -20,9 +20,46 @@ const adduser = async (req, res) => {
     return res.status(203).json({ message: 'registered sucessfully' })
 }
 
-const findusers=async(req,res)=>{
-    const find = await user.find()
-    res.send(find)
+const findusers = async (req, res) => {
+    try{
+        const find = await user.find({ role: 'User' }, { password: 0, __v: 0 })
+        res.send(find)
+    }
+    catch(err){
+        res.send(err)
+    }
+}
+
+export const getprofile = async (req, res) => {
+    try {
+        const userId = req.session.userId
+        const find = await user.findById({ _id: userId })
+        res.send(find)
+    }
+    catch (err) {
+        res.send(err)
+    }
+}
+
+export const updateprofile = async(req,res)=>{
+    const {name,email}= req.body
+    const userid = req.session.userId
+    try{
+        const find = await user.findById({_id:userid})
+        console.log(find);
+        
+        if(!find){
+          return  res.status(401).json({message:'user not found',find})
+        }
+        const update= await user.updateOne({_id:find},{name,email},{new:true})
+        console.log(update);
+        
+        
+       return res.send(update)
+    }
+    catch(err){
+        res.send(err)
+    }
 }
 
 const login = async (req, res) => {
@@ -43,12 +80,12 @@ const login = async (req, res) => {
             return res.status(401).json('incorrect password')
         }
         req.session.userId = check._id
-if(check.role==='User'){
+        if (check.role === 'User') {
 
-    return res.status(201).json({ message: 'login succesful', check })
-}
+            return res.status(201).json({ message: 'login succesful', check })
         }
-    
+    }
+
     catch (err) {
         res.status(500).json({ message: 'something went wrong' })
     }
@@ -58,7 +95,7 @@ const adminlogin = async (req, res) => {
     try {
         const { email, password } = req.body
 
-        const match = await user.findOne({ email }, { __v: 0})
+        const match = await user.findOne({ email }, { __v: 0 })
         console.log(match);
 
         if (!match) {
@@ -70,11 +107,11 @@ const adminlogin = async (req, res) => {
         }
 
         req.session.adminId = match._id
-        if(match.role==='Admin'){
+        if (match.role === 'Admin') {
 
             return res.status(201).json({ message: 'admin login sucessful', match })
         }
-        
+
     }
     catch (err) {
         res.status(500).json('internal server error')
@@ -112,4 +149,4 @@ const adminlogout = async (req, res) => {
 }
 
 
-export { adduser,findusers, login, adminlogin, logout, adminlogout }
+export { adduser, findusers, login, adminlogin, logout, adminlogout }
