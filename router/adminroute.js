@@ -1,11 +1,12 @@
 import express from "express"
 
-import { adminlogout, findusers,adminlogin } from "../controller/usercontroller.js"
+import { adminlogout, findusers,adminlogin, singleUser } from "../controller/usercontroller.js"
 import {addproduct,updateproduct,deleteproduct,findproduct,uploads} from "../controller/productcontrol.js"
 import {getcategory,updatecategory,addcategory,deletecategory} from "../controller/categorycontrol.js"
 import { deleteOrder, getOrder, updateOrder } from "../controller/ordercontrol.js"
+import { deleteuser, editUser } from "../controller/admincontroller.js"
 
-const router = express()
+const router =express.Router()
 
 router.post('/admin/login',adminlogin)
 
@@ -19,8 +20,12 @@ router.use('/admin',(req,res,next)=>{
 }
 })
 router.get('/admin/getusers',findusers)
+router.get('/admin/singleuser/:id',singleUser)
+router.delete('/admin/deleteuser/:id',deleteuser)
+router.put('/admin/edituser/:id',editUser)
+
 router.delete('/admin/logout',adminlogout)
-router.get('/admin/getproducts',findproduct)
+router.get('/admin/products',findproduct)
 router.post('/admin/addproducts',uploads.single('image'),addproduct)
 router.put('/admin/updateproducts/:id',uploads.single('image'),updateproduct)
 router.delete('/admin/deleteproducts/:id',deleteproduct)
