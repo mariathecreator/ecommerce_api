@@ -28,6 +28,6 @@ const productschema= new mongoose.Schema({
     },
     description:String,
     image:String
-})
+},{timestamps:true})
 
 export const product= new mongoose.model('product',productschema)

@@ -84,7 +84,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body
 
-        const check = await user.findOne({ email })
+        const check = await user.findOne({ email,role:"User" })
         console.log(check);
 
 
@@ -100,7 +100,7 @@ const login = async (req, res) => {
         }
         console.log(value);
         req.session.userId = check._id
-        if (check.role === 'User') {
+        if (check.status === 'Enable') {
             const data = await user.findOne({ email }, { password: 0 })
             return res.status(201).json({ message: "login sucessful", data })
         }
@@ -170,6 +170,9 @@ const adminlogout = async (req, res) => {
     }
 
 }
+
+
+
 
 
 export { adduser, findusers, login, adminlogin, logout, adminlogout }

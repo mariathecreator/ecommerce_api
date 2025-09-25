@@ -40,7 +40,7 @@ app.use((req,res,next)=>{
 //   error.status = 404;
 //   next(error);
 // });
-
+ 
 // //  Global error handler (must be the last middleware)
 // app.use((err, req, res, next) => {
 //   console.error("Error:", err.message);

@@ -9,8 +9,17 @@ const getcategory = async (req, res) => {
     catch (err) {
         return res.send(err)
     }
+}
 
-
+export const getcategoryid = async (req, res) => {
+    try {
+        const find = await category.findById(req.params.id)
+        console.log(find);
+        return res.send(find)
+    }
+    catch (err) {
+        return res.send(err)
+    }
 }
 
 const addcategory = async (req, res) => {

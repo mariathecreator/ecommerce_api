@@ -2,11 +2,11 @@ import { product } from "../model/productmodel.js";
 import multer from "multer";
 
 const storage = multer.diskStorage({
-    destination: (req, file, cd) => {
-        cd(null, 'uploads/')
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/')
     },
-    filename: (req, file, cd) => {
-        cd(null, Date.now() + '-' + file.originalname)
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname)
     }
 })
 
@@ -15,7 +15,8 @@ export const uploads = multer({ storage: storage })
 const addproduct = async (req, res) => {
     try {
         const { name, brand, price, description, category } = req.body
-        const image = req.file.filename
+        const image = req.file ? req.file.filename : null
+        // const image = req.file.filename
         const add = await product.create({ name, brand, price, description, category, image })
         return res.status(200).json({ message: 'products added sucessfully', add })
     }
@@ -23,6 +24,49 @@ const addproduct = async (req, res) => {
         return res.send(err)
     }
 }
+export const findproductid = async (req, res) => {
+    try {
+        const find = await product.findById(req.params.id).populate('category', 'name')
+        return res.status(200).json(find)
+        
+    }
+    catch (err) {
+        return res.status(500).json({error:err.message})
+    }
+}
+
+
+const findproduct = async (req, res) => {
+    try {
+        const find = await product.find().populate('category', 'name')
+        return res.status(200).json(find)
+        
+    }
+    catch (err) {
+        return res.status(500).json({error:err.message})
+    }
+}
+
+const deleteproduct = async (req, res) => {
+    try {
+        await product.findByIdAndDelete(req.params.id)
+        return res.status(200).json({ message: 'product deleted sucessfully' })
+    }
+    catch (err) {
+        return res.send(err)
+    }
+}
+
+//export const findAProduct = async (req,res)=>{
+//     try{
+//         const findaproduct = await product.findById(req.params.id)
+//         res.send(findaproduct)
+//     }
+//     catch(err){
+//         res.status(500).json({message:'something went wrong',err})
+//     }
+// }
+
 const updateproduct = async (req, res) => {
     try {
         const existing = await product.findById(req.params.id)
@@ -36,36 +80,5 @@ const updateproduct = async (req, res) => {
         return res.send(err)
     }
 }
- 
-const findproduct = async (req, res) => {
-    try {
-        const find = await product.find()
-       return res.send(find)
 
-    }
-    catch (err) {
-       return res.send(err)
-    }
-}
-
-const findAProduct = async (req,res)=>{
-    try{
-        const findaproduct = await product.findById(req.params.id)
-        res.send(findaproduct)
-    }
-    catch(err){
-        res.status(500).json({message:'something went wrong',err})
-    }
-}
-
-const deleteproduct = async (req, res) => {
-    try {
-        await product.findByIdAndDelete(req.params.id)
-        return res.status(202).json({ message: 'product deleted sucessfully' })
-    }
-    catch (err) {
-        return res.send(err)
-    }
-}
-
-export { addproduct, updateproduct, deleteproduct, findproduct, findAProduct } 
+export { addproduct, updateproduct, deleteproduct, findproduct } 
