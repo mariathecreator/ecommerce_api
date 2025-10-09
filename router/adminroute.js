@@ -3,7 +3,7 @@ import express from "express"
 import { adminlogout, findusers,adminlogin, singleUser } from "../controller/usercontroller.js"
 import {addproduct,updateproduct,deleteproduct,findproduct,uploads, findproductid} from "../controller/productcontrol.js"
 import {getcategory,updatecategory,addcategory,deletecategory, getcategoryid} from "../controller/categorycontrol.js"
-import { deleteOrder, getOrder, updateOrder } from "../controller/ordercontrol.js"
+import { admingetorder, deleteOrder, updateOrder } from "../controller/ordercontrol.js"
 import { deleteuser, editUser, userDisable, userEnable } from "../controller/admincontroller.js"
 
 const router =express.Router()
@@ -39,7 +39,7 @@ router.post('/admin/addcategories',addcategory)
 router.put('/admin/updatecategories/:id',updatecategory)
 router.delete('/admin/deletecategories/:id',deletecategory)
 
-router.get('/admin/getorder',getOrder)
+router.get('/admin/getorder',admingetorder)
 router.put('/admin/updateorder/:id',updateOrder)
 router.delete('/admin/deleteorder/:id',deleteOrder)
 

@@ -38,6 +38,16 @@ const findusers = async (req, res) => {
         res.send(err)
     }
 }
+
+export const singleUser = async (req, res) => {
+    try {
+        const singleuser = await user.findById(req.params.id, { password: 0 })
+        res.send(singleuser)
+    }
+    catch (err) {
+        res.send(err)
+    }
+}
 export const getprofile = async (req, res) => {
     try {
         const userId = req.session.userId
@@ -49,17 +59,7 @@ export const getprofile = async (req, res) => {
     }
 }
 
-export const singleUser = async (req, res) => {
-    try {
-        const singleuser = await user.findById(req.params.id, { password: 0 })
-        res.send(singleuser)
-    }
-    catch (err) {
-        res.send(err)
-    }
-}
-
-export const updateprofile = async (req, res) => {
+export const   updateprofile = async (req, res) => {
     const { name, email } = req.body
     const userid = req.session.userId
     try {
@@ -69,7 +69,7 @@ export const updateprofile = async (req, res) => {
         if (!find) {
             return res.status(401).json({ message: 'user not found', find })
         }
-        const update = await user.updateOne({ _id: find }, { name, email }, { new: true })
+        const update = await user.updateOne({ _id: userid }, { name, email }, { new: true })
         console.log(update);
 
 
@@ -143,11 +143,11 @@ const adminlogin = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-        const userid = req.params.id
-        console.log(userid);
-        if (req.session.userId == userid) {
+        // const userid = req.params.id
+        console.log(req.session.userId);
+        if (req.session.userId) {
             req.session.userId = null;
-            return res.status(200).json({ message: "user logout success", userid })
+            return res.status(200).json({ message: "user logout success" })
         }
         return res.json("fail")
     }

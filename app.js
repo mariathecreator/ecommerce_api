@@ -5,23 +5,36 @@ import MongoStore from "connect-mongo"
 import route from "./router/userroute.js"
 import router from "./router/adminroute.js"
 import cors  from "cors"
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+console.log(process.env.PORT);
 
 const app = express()
 app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
+  origin: process.env.CORS_URI,
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS']
 }));
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-await mongoose.connect('mongodb://127.0.0.1:27017/newproject')
+await mongoose.connect(process.env.MONGO_URI)
 
 app.use(session({
-    secret:'secret_key',
+    secret:process.env.SESSION_SECRET,
     resave:false,
     saveUninitialized:false,
-    store:MongoStore.create({mongoUrl:'mongodb://127.0.0.1:27017/newproject'})
+    store:MongoStore.create({mongoUrl:process.env.MONGO_URI}),
+  cookie: {
+    httpOnly: true,      // prevents JS access
+    secure: false,       // true only if you use HTTPS
+    sameSite: "lax",     // allow cookies to work cross-origin in dev
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
+
 }))
 
 app.use(route)
@@ -51,7 +64,7 @@ app.use((req,res,next)=>{
 //   });
 // });
 
-app.listen(3000,()=>{
-    console.log('server listening at port:3000');   
+app.listen(process.env.PORT,()=>{
+    console.log(`server listening at port:${process.env.PORT}`);   
 })
 

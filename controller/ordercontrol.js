@@ -3,19 +3,25 @@ import { product } from "../model/productmodel.js"
 import { cart } from "../model/cartmodel.js"
 
 export const getOrder = async (req, res) => {
-    const getorder = await order.find()
-    res.send(getorder)
+    try {
+        const userId = req.session.userId
+        const getorder = await order.find({ user: userId,delivery_status: { $ne: "delivered" } })
+        res.json(getorder)
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' })
+
+    }
 }
 
-export const getorderbyid = async(req,res)=>{
-    const getorderbyId = await order.findById(req.params.id)
+export const admingetorder = async (req, res) => {
+    const getorderbyId = await order.find().populate('user',"name email")
     res.send(getorderbyId)
 }
 
 
 export const addOrder = async (req, res) => {
     const userId = req.session.userId
-    const {delivery_status}= req.body
+    const { delivery_status } = req.body
 
 
     console.log(userId);
@@ -36,11 +42,11 @@ export const addOrder = async (req, res) => {
         console.log(productdata);
 
         if (!productdata) { continue }
-        
+
         subtotal = productdata.price * item.quantity,
-        
-        total += subtotal
-        
+
+            total += subtotal
+
         items.push({
             userId,
             productname: productdata.name,
@@ -49,9 +55,9 @@ export const addOrder = async (req, res) => {
             subtotal
         })
     }
-    
+
     const createorder = await order.create({
-        user:userId,
+        user: userId,
         items,
         total,
         delivery_status
@@ -63,15 +69,15 @@ export const addOrder = async (req, res) => {
 }
 
 
-export const updateOrder = async(req,res)=>{
-    const {delivery_status} = req.body
+export const updateOrder = async (req, res) => {
+    const { delivery_status } = req.body
     const orderId = req.params.id
 
-    const update = await order.findByIdAndUpdate(orderId,{delivery_status},{new:true})
+    const update = await order.findByIdAndUpdate(orderId, { delivery_status }, { new: true })
     res.send(update)
 }
 
- export const deleteOrder = async(req,res)=>{
+export const deleteOrder = async (req, res) => {
     const deletedorder = await order.findByIdAndDelete(req.params.id)
     res.send(deletedorder)
 }

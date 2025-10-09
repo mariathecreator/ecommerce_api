@@ -9,7 +9,7 @@ export const addtocart = async (req, res) => {
 
 
     //const newproductid = productId
-    try {
+    try { 
 
         if (!user) {
             res.status(401).json({ message: 'no cart found' })
@@ -35,8 +35,8 @@ export const addtocart = async (req, res) => {
                     // cartexist.items[existingindex].subtotal = cartexist.items[existingindex].quantity * productexist.price
                     //  cartexist.total += cartexist.items[existingindex].subtotal
                 }
-                else{
-                    return res.json({message:'quantity is negative'})
+                else {
+                    return res.json({ message: 'quantity is negative' })
                 }
             }
             else {
@@ -86,7 +86,8 @@ export const addtocart = async (req, res) => {
 export const updatecart = async (req, res) => {
     const productId = req.params.id
     const user = req.session.userId
-    const { quantity } = req.body
+    // const { quantity } = req.body
+    const { action } = req.body
 
     try {
         const getcart = await cart.findOne({ userId: user })
@@ -98,42 +99,45 @@ export const updatecart = async (req, res) => {
         if (!getcart) {
             return res.status(401).json({ message: 'no cart found' })
         }
-        else {
-            const index = getcart.items.findIndex(item => item.product.toString() === productId)
-            console.log(index);
+
+        const index = getcart.items.findIndex(item => item.product.toString() === productId)
+        console.log(index);
 
 
-            if (index !== -1) {
-                if (quantity > 0) {
-                    getcart.items[index].quantity = quantity
-                    // getcart.items[index].subtotal = getcart.items[index].quantity * getproduct.price
-                    console.log("get out here! now");
-                }
-                else {
-                    return res.json({ message: 'quantity is negative' })
-                }
+        if (index !== -1) {
+            // if (quantity > 0)
+            if (action === 'increment') {
+                getcart.items[index].quantity += 1
+                // getcart.items[index].subtotal = getcart.items[index].quantity * getproduct.price
+                console.log("get out here! now");
             }
-            else {
-                //     const item = {
-                //         product: productId,
-                //         quantity,
-                //         // subtotal: quantity * getproduct.price
-                //     }
-                //     getcart.items.push(item)
-                return res.json({ message: " item not found in the cart" })
-
+            else if (action === 'decrement' && getcart.items[index].quantity > 1) {
+                getcart.items[index].quantity -= 1
             }
-            // await getcart.save()
-            console.log("don't be shy");
-            // console.log(getcart);
-            return res.json({ message: "product added to cart sucessfully", getcart })
-
-            // return sub.length > 0 ? sub[0].subtotal : 0;
         }
+        else {
+            //     const item = {
+            //         product: productId,
+            //         quantity,
+            //         // subtotal: quantity * getproduct.price
+            //     }
+            //     getcart.items.push(item)
+            return res.json({ message: " item not found in the cart" })
 
+        }
+        // await getcart.save()
+        console.log("don't be shy");
+        // console.log(getcart);
+        
+        // return sub.length > 0 ? sub[0].subtotal : 0;
+        const productData = await product.findById(productId)
+        getcart.items[index].subtotal = getcart.items[index].quantity * productData.price
+        getcart.total = getcart.items.reduce((acc, item) => acc + item.subtotal, 0)
+        await getcart.save()    
+        return res.json( getcart )
     }
     catch (err) {
-        return res.send(err)
+        return res.status(500).json(err)
     }
 }
 
@@ -188,23 +192,25 @@ export const viewcart = async (req, res) => {
 
 
 export const deleteCartItem = async (req, res) => {
-    const user = req.session.userId
-    const productId = req.params.id
+  const user = req.session.userId
+  const productId = req.params.id
 
-    const newproduct = productId
-
-    try {
-        const findcart = await cart.findOne({ userId: user })
-        if (!findcart) {
-            return res.status(401).json({ message: 'No cart found for this user' })
-        }
-        findcart.items = findcart.items.filter(item => item.product.toString() !== newproduct)
-        await findcart.save()
-
-
-        return res.status(202).json({ message: 'item deleted from cart sucessfully', findcart })
+  try {
+    const findcart = await cart.findOne({ userId: user })
+    if (!findcart) {
+      return res.status(401).json({ message: 'No cart found for this user' })
     }
-    catch (err) {
-        return res.send(err)
-    }
+
+    // remove the item
+    findcart.items = findcart.items.filter(item => item.product.toString() !== productId)
+
+    // recalc total
+    findcart.total = findcart.items.reduce((acc, item) => acc + item.subtotal, 0)
+
+    await findcart.save()
+
+    return res.status(200).json(findcart)
+  } catch (err) {
+    return res.status(500).json(err)
+  }
 }
