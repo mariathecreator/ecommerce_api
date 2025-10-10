@@ -13,8 +13,17 @@ console.log(process.env.PORT);
 
 const app = express()
 
+const allowedOrigins =process.env.CORS_URI.split(",")
+
 app.use(cors({
-  origin: process.env.CORS_URI,
+  origin:(origin,callback)=>{
+    if(!origin || allowedOrigins.includes(origin)){
+      callback(null,true)
+    }
+    else{
+      callback(new Error("not allowed by  cors"))
+    }
+  },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS']
 }));
