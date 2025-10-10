@@ -38,8 +38,8 @@ app.use(session({
 
 }))
 
-app.use(route)
-app.use(router)
+app.use('/api',route)
+app.use('/api',router)
 app.use('/uploads',express.static('uploads'))
 
 app.use((req,res,next)=>{
