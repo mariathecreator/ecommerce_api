@@ -15,6 +15,7 @@ route.post('/user/login',login)
 route.get('/products',findproduct)
 route.get('/products/:id',findproductid)
 route.get('/categories',getcategory)
+route.get('/search',searchProduct)
 
 
 
@@ -33,7 +34,6 @@ route.put('/user/updateprofile',updateprofile)
 
 route.get('/user/viewproducts',findproduct)
 route.get('/user/viewproduct/:id',findproductid)
-route.get('/user/search',searchProduct)
 
 route.post('/user/addcart/:id',addtocart)
 route.put('/user/updatecart/:id',updatecart)
