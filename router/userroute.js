@@ -3,7 +3,7 @@ import {adduser,updateprofile,getprofile,login,logout} from "../controller/userc
 import { addtocart, deleteCartItem, updatecart, viewcart } from "../controller/cartcontroller.js"
 import { getcategory } from "../controller/categorycontrol.js"
 import { findproduct, findproductid, searchProduct } from "../controller/productcontrol.js"
-import { addOrder, getOrder } from "../controller/ordercontrol.js"
+import { addOrder, cancelOrder,  getOrder } from "../controller/ordercontrol.js"
 
 
 const route = express.Router()
@@ -43,6 +43,7 @@ route.delete('/user/deleteitems/:id',deleteCartItem)
 route.get('/user/getorder',getOrder)
 // route.get('/user/getorder/:id',admingetorder)
 route.post('/user/addorder',addOrder)
+route.put('/user/deleteorder/:id',cancelOrder)
 
 
 

@@ -69,7 +69,7 @@ export const   updateprofile = async (req, res) => {
         if (!find) {
             return res.status(401).json({ message: 'user not found', find })
         }
-        const update = await user.updateOne({ _id: userid }, { name, email }, { new: true })
+        const update = await user.updateOne({ _id: userid }, { name, email}, { new: true })
         console.log(update);
 
 

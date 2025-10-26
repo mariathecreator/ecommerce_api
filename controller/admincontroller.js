@@ -1,5 +1,25 @@
 import { user } from "../model/usermodel.js";
 
+export const getadmin = async (req, res) => {
+  try {
+    
+    if (!req.session.adminId) {
+      return res.status(401).json({ message: "Unauthorized. Please log in as admin." });
+    }
+
+    const admin = await user.findById(req.session.adminId).select("-password");
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.status(200).json(admin);
+  } catch (err) {
+    console.error("Error fetching admin:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 const deleteuser=async(req,res)=>{
 const get=await user.findByIdAndDelete(req.params.id)
 res.send(get)

@@ -4,19 +4,57 @@ import { cart } from "../model/cartmodel.js"
 
 export const getOrder = async (req, res) => {
     try {
-        const userId = req.session.userId
-        const getorder = await order.find({ user: userId,delivery_status: { $ne: "delivered" } })
-        res.json(getorder)
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' })
+        const userId = req.session.userId;
 
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized. Please log in." });
+        }
+
+        const orders = await order
+            .find({ user: userId })
+            .populate('items.product', 'name price image');
+
+        const formattedOrders = orders.map(o => ({
+            ...o._doc,
+            items: o.items.map(item => ({
+                ...item._doc,
+                image: item.product?.image || null,
+                productname: item.product?.name || item.productname
+            }))
+        }));
+
+        res.status(200).json(formattedOrders);
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-}
+};
+
 
 export const admingetorder = async (req, res) => {
-    const getorderbyId = await order.find().populate('user',"name email")
-    res.send(getorderbyId)
-}
+    try {
+        const orders = await order
+            .find()
+            .populate('user', 'name email')                 
+            .populate('items.product', 'image name price'); 
+
+       
+        const formattedOrders = orders.map(o => ({
+            ...o._doc,
+            items: o.items.map(item => ({
+                ...item._doc,
+                image: item.product?.image || null,         
+                productname: item.product?.name || item.productname
+            }))
+        }));
+console.log(JSON.stringify(formattedOrders, null, 2));
+
+        res.json(formattedOrders);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
 
 
 export const addOrder = async (req, res) => {
@@ -52,7 +90,8 @@ export const addOrder = async (req, res) => {
             productname: productdata.name,
             price: productdata.price,
             quantity: item.quantity,
-            subtotal
+            subtotal,
+            product:productdata._id
         })
     }
 
@@ -77,9 +116,23 @@ export const updateOrder = async (req, res) => {
     res.send(update)
 }
 
-export const deleteOrder = async (req, res) => {
-    const deletedorder = await order.findByIdAndDelete(req.params.id)
-    res.send(deletedorder)
+export const cancelOrder = async (req, res) => {
+    try {
+        const userId = req.session.userId
+
+        const userOrder = await order.findById(req.params.id, { user: userId })
+        if (!userOrder) {
+            return res.status(404).json(({ message: "order not found " || "unauthorized" }))
+        }
+        userOrder.delivery_status = "cancelled"
+        await userOrder.save()
+
+        res.status(200).json({ message: "order cancelled successfully", order: userOrder })
+    }
+    catch (err) {
+        console.error("Error cancelling order:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 }
 
 

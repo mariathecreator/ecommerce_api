@@ -90,7 +90,7 @@ export const searchProduct = async (req, res) => {
     try {
         const products= await product.find({
             name:{$regex:query,$options:'i'}
-        })
+        }).populate('category','name')
         res.json(products)
     }
     catch(err){

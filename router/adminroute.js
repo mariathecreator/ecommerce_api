@@ -3,8 +3,8 @@ import express from "express"
 import { adminlogout, findusers,adminlogin, singleUser } from "../controller/usercontroller.js"
 import {addproduct,updateproduct,deleteproduct,findproduct,uploads, findproductid} from "../controller/productcontrol.js"
 import {getcategory,updatecategory,addcategory,deletecategory, getcategoryid} from "../controller/categorycontrol.js"
-import { admingetorder, deleteOrder, updateOrder } from "../controller/ordercontrol.js"
-import { deleteuser, editUser, userDisable, userEnable } from "../controller/admincontroller.js"
+import { admingetorder, updateOrder } from "../controller/ordercontrol.js"
+import { deleteuser, editUser, getadmin, userDisable, userEnable } from "../controller/admincontroller.js"
 
 const router =express.Router()
 
@@ -19,6 +19,7 @@ router.use('/admin',(req,res,next)=>{
         res.status(401).json({ message: "Unauthorized" })
 }
 })
+router.get('/admin/getadmin',getadmin)
 router.get('/admin/getusers',findusers)
 router.get('/admin/singleuser/:id',singleUser)
 router.delete('/admin/deleteuser/:id',deleteuser)
@@ -41,7 +42,7 @@ router.delete('/admin/deletecategories/:id',deletecategory)
 
 router.get('/admin/getorder',admingetorder)
 router.put('/admin/updateorder/:id',updateOrder)
-router.delete('/admin/deleteorder/:id',deleteOrder)
+
 
 
 export default router

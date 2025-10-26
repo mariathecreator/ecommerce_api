@@ -160,6 +160,7 @@ export const viewcart = async (req, res) => {
                 $addFields: {
                     'items.product_name': '$productDetails.name',
                     'items.product_price': '$productDetails.price',
+                    'items.product_image':'$productDetails.image',
                     'items.subtotal': {
                         $multiply: ['$items.quantity', '$productDetails.price']
                     }
